@@ -1,19 +1,22 @@
-# DevOps Engineer Practical Challenge - Production-Ready Deployment
+# DevOps Practical Challenge: Production-Ready AWS Deployment
 
-## Overview
-This project demonstrates a production-ready application deployment on AWS using modern DevOps practices. It features a Python/Flask API containerized with Docker, infrastructure provisioned via Terraform, and a CI/CD pipeline managed by Jenkins.
+## Intro
+Hey there! This is my submission for the DevOps Engineer Practical Challenge. I've put together a system that focuses on being "production-ready"—meaning it's not just about getting code to run, but making sure it's secure, automated, and easy to maintain.
 
-## Architecture
-The architecture follows AWS best practices for security and scalability:
+I decided to go with a **Python/Flask** app deployed on **AWS ECS Fargate**. I chose this path because it balances scalability with low operational overhead—no need to babysit EC2 instances.
 
-- **VPC:** Custom VPC with 2 public subnets (for ALB) and 2 private subnets (for ECS tasks).
-- **Compute:** Amazon ECS using AWS Fargate (serverless containers).
-- **Networking:** Application Load Balancer (ALB) for traffic distribution.
-- **Registry:** Amazon ECR for Docker image storage.
-- **Monitoring:** CloudWatch Log Groups for application and infrastructure logs.
-- **Security:** Security Groups for least-privilege access; IAM roles for ECS task execution.
+## What's in the Box?
+- **App:** A simple Flask API (because simplicity is clear).
+- **IaC:** Terraform scripts to spin up the whole AWS environment.
+- **CI/CD:** A Jenkinsfile that handles the heavy lifting (testing, building, and deploying).
+- **Automation:** A quick `deploy.sh` script to get everything started without clicking around the AWS console.
 
-### Architecture Diagram
+## The Architecture (How it works)
+I followed a "security-first" approach for the network:
+- **Public Subnets:** Only the Load Balancer lives here. It's the only part that talks to the internet.
+- **Private Subnets:** The application containers live here, totally isolated.
+- **Registry & Logs:** Images are stored in ECR, and logs flow directly into CloudWatch so you can actually see what's happening in the containers.
+
 ```mermaid
 graph TD
     User((User)) --> ALB[Application Load Balancer]
@@ -34,54 +37,29 @@ graph TD
     Jenkins --> ECS
 ```
 
-## Prerequisites
-- AWS Account and CLI configured.
-- Terraform (v1.5+ recommended).
-- Docker.
-- Jenkins (with Docker, Pipeline, and AWS Credentials plugins).
-
-## Deployment Steps
-
-### 1. Infrastructure Provisioning
-You can use the provided automation script:
+## How to run this
+### 1. The Quick Start (Terraform)
+I've included a script to automate the initial setup. Just make sure your AWS CLI is configured:
 ```bash
 chmod +x scripts/deploy.sh
 ./scripts/deploy.sh
 ```
-Or manually:
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-*Note the `alb_hostname` and `ecr_repository_url` outputs.*
+This will spin up the VPC, ECS cluster, and push the first version of the app.
 
-### 2. CI/CD Setup (Jenkins)
-1. Create a new "Pipeline" job in Jenkins.
-2. Add the following credentials:
-   - `aws-account-id`: Secret text (Your AWS Account ID).
-   - AWS Credentials for the Jenkins node to interact with AWS (IAM User/Role with ECR/ECS permissions).
-3. Point the pipeline to the GitHub repository containing the `Jenkinsfile`.
-4. Run the pipeline. It will:
-   - Run unit tests.
-   - Build and push the Docker image to ECR.
-   - Deploy the new version to the ECS Service.
+### 2. Jenkins Pipeline
+Once the infrastructure is up:
+1. Point your Jenkins job to this repo.
+2. Make sure your Jenkins has the `aws-account-id` credential.
+3. Hit 'Build' and watch it go!
 
-## Design Decisions
-- **Fargate over EC2:** Chosen to minimize operational overhead. Fargate handles the underlying infrastructure, allowing us to focus on the application.
-- **VPC Design:** Using public subnets for the Load Balancer and private subnets for the application tasks ensures that the application is not directly reachable from the internet, significantly reducing the attack surface.
-- **Stateless Application:** The Flask app is designed to be stateless, enabling horizontal scaling across multiple availability zones.
-- **Infrastructure as Code (Terraform):** Using Terraform ensures the infrastructure is version-controlled, repeatable, and avoids "configuration drift" associated with manual changes in the AWS Console.
-- **CloudWatch Logging:** Integrated `awslogs` for real-time monitoring and debugging without needing to SSH into containers.
+## My Design Thinking (The "Why")
+- **Why Fargate?** In a real production environment, I want my team focused on the app, not patching OS kernels on EC2 nodes.
+- **Why Private Subnets?** Even for a simple challenge, I believe in starting with a secure foundation. No app should be directly exposed if it doesn't have to be.
+- **Why Jenkins?** It's the industry standard for a reason. I used a Declarative Pipeline because it's easier to read and version-control.
 
-## Assumptions
-- The AWS IAM user/role running Terraform has sufficient permissions to create VPCs, ECS clusters, and ECR repositories.
-- Jenkins is hosted on a server that has Docker installed and has network connectivity to AWS APIs.
-- A NAT Gateway is provisioned to allow ECS tasks in private subnets to pull images from ECR.
+## Assumptions & Notes
+- I assumed a NAT Gateway is acceptable for this setup (needed for the private subnets to reach ECR).
+- The Jenkins server is assumed to be outside this VPC but with proper IAM permissions.
 
-## Clean-up
-To avoid ongoing AWS costs, destroy the infrastructure:
-```bash
-cd terraform
-terraform destroy
-```
+---
+*If you have any questions about my choices or how to run this, feel free to reach out!*
