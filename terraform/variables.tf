@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "project_name" {
   description = "Project name"
-  default     = "devops-challenge"
+  default     = "damolak-challange"
 }
 
 variable "vpc_cidr" {

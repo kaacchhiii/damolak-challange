@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        PROJECT_NAME = 'devops-challenge'
+        PROJECT_NAME = 'damolak-challange'
         AWS_ACCOUNT_ID = credentials('aws-account-id')
         ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_NAME = "${ECR_URL}/${PROJECT_NAME}"
