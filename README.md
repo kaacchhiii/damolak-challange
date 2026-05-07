@@ -1,4 +1,4 @@
-# DevOps Practical Challenge: Production-Ready AWS Deployment
+# DevOps Practical Challenge: Production-Ready AWS Deployment (damolak-challange)
 
 ## Intro
 Hey there! This is my submission for the DevOps Engineer Practical Challenge. I've put together a system that focuses on being "production-ready"—meaning it's not just about getting code to run, but making sure it's secure, automated, and easy to maintain.
