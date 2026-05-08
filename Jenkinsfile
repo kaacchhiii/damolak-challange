@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     environment {
         AWS_REGION = 'us-east-1'
         PROJECT_NAME = 'damolak-challange'
@@ -8,12 +9,14 @@ pipeline {
         IMAGE_NAME = "${ECR_URL}/${PROJECT_NAME}"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Test') {
             steps {
                 script {
@@ -22,18 +25,18 @@ pipeline {
                 }
             }
         }
+
         stage('Build & Push') {
             steps {
                 script {
                     sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URL}"
-                    
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest app/"
-                    
                     sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker push ${IMAGE_NAME}:latest"
                 }
             }
         }
+
         stage('Deploy') {
             steps {
                 script {
@@ -42,6 +45,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             sh "docker logout ${ECR_URL}"

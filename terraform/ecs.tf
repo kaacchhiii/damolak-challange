@@ -1,10 +1,12 @@
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster"
 }
+
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/ecs/${var.project_name}"
   retention_in_days = 30
 }
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
@@ -34,6 +36,7 @@ resource "aws_ecs_task_definition" "app" {
     }
   ])
 }
+
 resource "aws_ecs_service" "main" {
   name            = "${var.project_name}-service"
   cluster         = aws_ecs_cluster.main.id

@@ -3,6 +3,7 @@ resource "aws_alb" "main" {
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.alb.id]
 }
+
 resource "aws_alb_target_group" "app" {
   name        = "${var.project_name}-tg"
   port        = 80
@@ -19,6 +20,7 @@ resource "aws_alb_target_group" "app" {
     unhealthy_threshold = "2"
   }
 }
+
 resource "aws_alb_listener" "front_end" {
   load_balancer_arn = aws_alb.main.id
   port              = "80"

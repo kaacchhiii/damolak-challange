@@ -15,6 +15,7 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-ecs-tasks-sg"
   description = "Allow inbound access from the ALB only"
@@ -32,6 +33,7 @@ resource "aws_security_group" "ecs_tasks" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.project_name}-ecsTaskExecutionRole"
   assume_role_policy = jsonencode({
@@ -47,6 +49,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
     ]
   })
 }
+
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
